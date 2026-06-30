@@ -1,40 +1,59 @@
-from torchvision.datasets import FashionMNIST
-from torchvision import transforms
-import numpy as np
-import torch.utils.data as Data
+from typing import Literal
+
 import matplotlib.pyplot as plt
+import numpy as np
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from torchvision.datasets import FashionMNIST
 
-train_data = FashionMNIST(
-    root="./data",
-    train=True,
-    transform=transforms.Compose([transforms.Resize(size=224), transforms.ToTensor()]),
-    download=True,
-)
-
-train_loader = Data.DataLoader(
-    dataset=train_data,
-    batch_size=64,
-    shuffle=True,
-    num_workers=0,
-)
-
-for step, (b_x, b_y) in enumerate(train_loader):
-    if step > 0:
-        break
-batch_x = b_x.squeeze().numpy()
-batch_y = b_y.numpy()
-class_label = np.unique(batch_y)
-print(class_label)
-print(batch_x.shape)
+DATA_DIR = "./data"
+IMAGE_SIZE = 224
+BATCH_SIZE = 64
+NUM_WORKERS = 0
+SAMPLE_FIGURE_SIZE: tuple[float, float, Literal["in"]] = (12.0, 5.0, "in")
 
 
-plt.figure(figsize=(12,5))
+def load_train_data() -> FashionMNIST:
+    return FashionMNIST(
+        root=DATA_DIR,
+        train=True,
+        transform=transforms.Compose([transforms.Resize(size=IMAGE_SIZE), transforms.ToTensor()]),
+        download=True,
+    )
 
-for ii in np.arange(len(batch_y)):
-    plt.subplot(4, 16,ii + 1)
-    plt.imshow(batch_x[ii,:, :], cmap=plt.cm.gray)
-    plt.title(class_label[batch_y[ii]],size=10)
-    plt.axis("off")
+
+def build_train_loader(train_data: FashionMNIST) -> DataLoader:
+    return DataLoader(
+        dataset=train_data,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=NUM_WORKERS,
+    )
+
+
+def show_sample_batch() -> None:
+    train_data = load_train_data()
+    train_loader = build_train_loader(train_data)
+    batch_x, batch_y = next(iter(train_loader))
+
+    images = batch_x.squeeze().numpy()
+    labels = batch_y.numpy()
+    class_names = train_data.classes
+
+    print(np.unique(labels))
+    print(images.shape)
+
+    plt.figure(figsize=SAMPLE_FIGURE_SIZE)
+
+    for index in np.arange(len(labels)):
+        plt.subplot(4, 16, index + 1)
+        plt.imshow(images[index, :, :], cmap=plt.cm.gray)
+        plt.title(class_names[int(labels[index])], size=10)
+        plt.axis("off")
+
     plt.subplots_adjust(wspace=0.05)
+    plt.show()
 
-plt.show()
+
+if __name__ == "__main__":
+    show_sample_batch()

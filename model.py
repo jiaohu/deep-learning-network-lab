@@ -1,12 +1,10 @@
 import torch
 from torch import nn
-from torchsummary import summary
 
 
 class LeNet(nn.Module):
-
-    def __init__(self):
-        super(LeNet, self).__init__()
+    def __init__(self) -> None:
+        super().__init__()
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5, padding=2)
         self.sig = nn.Sigmoid()
         self.s1 = nn.AvgPool2d(kernel_size=2, stride=2)
@@ -18,7 +16,7 @@ class LeNet(nn.Module):
         self.fc2 = nn.Linear(in_features=120, out_features=84)
         self.fc3 = nn.Linear(in_features=84, out_features=10)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.sig(self.conv1(x))
         x = self.s1(x)
         x = self.sig(self.conv2(x))
@@ -30,13 +28,19 @@ class LeNet(nn.Module):
         return x
 
 
-def get_device():
-
+def get_device() -> torch.device:
     if torch.cuda.is_available():
         return torch.device("cuda")
     return torch.device("cpu")
 
-if __name__ == '__main__':
+
+def main() -> None:
+    from torchsummary import summary
+
     device = get_device()
     model = LeNet().to(device)
     print(summary(model, (1, 28, 28)))
+
+
+if __name__ == "__main__":
+    main()
