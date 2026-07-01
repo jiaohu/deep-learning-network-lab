@@ -57,9 +57,9 @@ class AlexNet(nn.Module):
 
         x = self.flatten(x)
         x = self.ReLU(self.fc1(x))
-        x = F.dropout(x, p=0.5)
+        x = F.dropout(x, p=0.5, training=self.training)
         x = self.ReLU(self.fc2(x))
-        x = F.dropout(x, p=0.5)
+        x = F.dropout(x, p=0.5, training=self.training)
         x = self.fc3(x)
 
         return x
