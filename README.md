@@ -42,7 +42,7 @@ python plot.py
 训练模型：
 
 ```bash
-python model_train.py
+python lenet_train.py
 ```
 
 训练完成后会生成：
